@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ParsingExample {
 
-    String filePath = "D:/programming/java/practice/tika-practice/src/main/resources/test.docx";
+    String filePath = "D:/programming/java/practice/tika-practice/src/main/resources/一碗阳春面.docx";
 
     public String parseByFacade() {
         Tika tika = new Tika();
@@ -191,7 +191,7 @@ public class ParsingExample {
 
 //        System.out.println(example.parseOnePartToHTML());
 
-        System.out.println(example.parseToPlainTextChunks().size());
+//        System.out.println(example.parseToPlainTextChunks().size());
 
     }
 
