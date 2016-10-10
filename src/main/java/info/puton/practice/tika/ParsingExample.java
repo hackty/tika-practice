@@ -1,9 +1,14 @@
 package info.puton.practice.tika;
 
 import org.apache.tika.Tika;
+import org.apache.tika.detect.EncodingDetector;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.txt.*;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.ContentHandlerDecorator;
 import org.apache.tika.sax.ToXMLContentHandler;
@@ -14,10 +19,8 @@ import org.apache.tika.sax.xpath.XPathParser;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +29,72 @@ import java.util.List;
  */
 public class ParsingExample {
 
-    String filePath = "D:/programming/java/practice/tika-practice/src/main/resources/一碗阳春面.docx";
+//    String filePath = "D:/programming/java/practice/tika-practice/src/main/resources/一碗阳春面.docx";
+//    String filePath = "D:/programming/java/product/smartsearch/src/test/resources/徽商准备工作.txt";
+    String filePath = "C:/Users/taoyang/Desktop/cmcc测试.txt";
+//    String filePath = "C:/Users/taoyang/Desktop/徽商准备工作3.txt";
+
+    public String parseTXT(){
+
+        Parser parser = new TXTParser();
+        InputStream input = null;
+        try{
+            Metadata metadata = new Metadata();
+            input = new FileInputStream(filePath);
+            ContentHandler handler = new BodyContentHandler();//当文件大于100000时，new BodyContentHandler(1024*1024*10);
+            ParseContext context = new ParseContext();
+            context.set(Parser.class,parser);
+            parser.parse(input,handler, metadata,context);
+            for(String name:metadata.names()) {
+                System.out.println(name+":"+metadata.get(name));
+            }
+            System.out.println(handler.toString());
+            return handler.toString();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                if(input!=null)input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * 获取编码
+     * @throws IOException
+     * @throws Exception
+     */
+    public static String getEncode(byte[] data,String url){
+        CharsetDetector detector = new CharsetDetector();
+        detector.setText(data);
+        CharsetMatch match = detector.detect();
+        String encoding = match.getName();
+        System.out.println("The Content in " + match.getName());
+        CharsetMatch[] matches = detector.detectAll();
+        System.out.println("All possibilities");
+        for (CharsetMatch m : matches) {
+            //System.out.println("CharsetName:" + m.getName() + " Confidence:"+ m.getConfidence());
+        }
+        return encoding;
+    }
+    public static String getEncode(InputStream data,String url) throws IOException{
+        CharsetDetector detector = new CharsetDetector();
+        detector.setText(data);
+        CharsetMatch match = detector.detect();
+        String encoding = match.getName();
+        System.out.println("The Content in " + match.getName());
+
+        CharsetMatch[] matches = detector.detectAll();
+        System.out.println("All possibilities");
+        for (CharsetMatch m : matches) {
+            // System.out.println("CharsetName:" + m.getName() + " Confidence:"+ m.getConfidence());
+        }
+        return encoding;
+    }
 
     public String parseByFacade() {
         Tika tika = new Tika();
@@ -178,6 +246,8 @@ public class ParsingExample {
     public static void main(String[] args) {
 
         ParsingExample example = new ParsingExample();
+
+        System.out.println(example.parseTXT());
 
 //        System.out.println(example.parseByFacade());
 
